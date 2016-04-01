@@ -1,0 +1,192 @@
+---
+title: The Effect of Dose and Delivery Method of Vitamin C on the Growth of Odontoblasts
+  of the Incisor Tooth of the Guinea Pig
+author: "John James"
+date: "March 28, 2016"
+output:
+  word_document: default
+  html_document:
+    theme: journal
+---
+
+```{r setup, include=FALSE, echo=TRUE}
+library(knitr)
+library(kfigr)
+library(printr)
+read_chunk("toothgrowth.R")
+knitr::opts_chunk$set(fig.width = 5, fig.height = 4, fig.path = "../figures/", echo=TRUE, warning=FALSE)
+```
+
+```{r environment, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<environment>>
+```
+#Introduction
+**Objectives:** The purpose of the study was to ascertain the degree to which delivery method and/or dosage of vitamin C affect growth of odontoblast cells in guinea pigs.
+
+**Data Analysis:** Distributions of data were graphically summarized and two sample t-tests were conducted by dose, delivery method, and treatment to ascertain statistical significance of observations.
+
+**Conclusions:** There is a positive correlation between vitamin C dose and incisor odontoblast cell growth in guinea pigs, regardless of delivery method.  Further, greater cell growth is associated with the administration of vitamin C with orange juice, at the lower doses (0.5mg and 1mg). There is no statistically significant difference in cell growth between delivery methods at the 2mg dose.
+
+#Data
+The data frame consisted of 60 observations of 3 variables.
+
+1. Length - The length of the odontoblast cell in microns[3]
+2. Supplement - The delivery method, eith er orange juice or an aqueous solution of ascorbic acid
+3. Dose - Dose in milligrams per day. Values were 0.5, 1.0, and 2.0.
+
+To facilitate data analysis, the data frame was copied and the dose was changed to a factor variable and the dose and supp variables were combined to create a third combined variable.
+```{r copyDataFrame, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<copyDataframe>>
+```
+
+```{r descStats, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<descStats>>
+```
+
+```{r power, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<power>>
+```
+
+As shown in `r figr("tgStats", TRUE, type="Table")`, cell lengths range from `r tgStats$Min` to `r tgStats$Max` microns and have mean μ = `r round(tgStats$Mean,2)` and variance σ^2^ = `r round(tgStats$Var,2)`. There were `r tgStats$NAs` NA values observed in the data.
+
+##Odontoblast Cell Growth and Dose, Delivery Method and Treatment
+`r figr("boxPlots", TRUE, type="Figure")` (left) presents a positive correlation between dose and mean odontoblast cell growth with mean cell lengths of `r round(doseStats[[1,6]],2)`, `r round(doseStats[[2,6]],2)`, and `r round(doseStats[[3,6]],2)` microns for doses 0.5mg, 1mg, and 2mg respectively (`r figr("doseStats", TRUE, type = "Table")`). `r figr("boxPlots", TRUE, type="Figure")` (right) further indicates greater cell growth across all doses when vitamin C was administered with orange juice, with mean cell lengths of `r round(suppStats[[1,6]],2)` and `r round(suppStats[[2,6]],2)`, microns for orange juice and the aqueous solution, respectively (`r figr("suppStats", TRUE, type = "Table")`). The top three treatments, as indicated in `r figr("treatmentBoxPlot", TRUE, type="Figure")`, were associated with higher doses and generated cell growth of `r round(treatmentStats[[4,6]],2)`, `r round(treatmentStats[[5,6]],2)`, and `r round(treatmentStats[[6,6]],2)` microns respectively (`r figr("treatmentStats", TRUE, type = "Table")`).
+
+##Data Distribution
+`r figr("distributions", TRUE, type = "Figure")` evinces an approximately normal, albiet slightly left skewed, distribution of the observations for all doses and, with the exception of a spike in measurements at about 9 microns, for treatments where vitamin C was administered with orange juice. Measurements for the 0.5 and 2mg doses, as well as for those in which vitamin C was administered with the aqueous solution, are slightly right skewed normal.  The distribution of measurements for the 1mg dose are bimodal and nearly symmetrical.
+
+#Methods
+Two sample, unpaired, t-tests were conducted on a univariate basis to confirm the statistically significant differences in mean cell growth among the various doses and delivery methods. Having established results on a univariate basis, t-tests were conducted to ascertain any statistically significant differences in cell growth among the various treatments.
+
+The following outlines the **assumptions** undertaken for this analysis:
+
+1. Insofar as parametric t-tests are robust to assumptions of normality for small sample sets[4], normality was assumed for the total data set and for each subset.
+2. A power π = 0.8 is assumed.  As such, differences in mean cell growth of `r round(del10,2)`, `r round(del20,2)`, and `r round(del30,2)` should be detectible at α = 0.5 and at assumed σ = `r round(tgStats[1,8])`, for sample sizes of 10, 20, and 30 respectively.
+3. Each pig was administered one, and only one combination of dose and delivery method, or treatment. As such, the t-tests conducted assumed unpaired samples.
+4. Given the variability in cell growth length, at the aggregate level (`r figr("tgStats", TRUE, type="Table")`), and at each subset (`r figr("doseStats", TRUE, type="Table")` and `r figr("suppStats", TRUE, type="Table")`), unequal variances were assumed.
+
+#Analysis
+```{r ttest, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<t.tests>>
+```
+##Impact of Vitamin C Dose on Odontoblast Cell Growth
+To ascertain the statistical difference in mean cell growth among the **doses**, the following hypotheses were tested.
+
+**1mg versus 0.5mg Dose**        
+H0: μ1 =  μ0 | Ha; μ1 <> μ0 {where μ0 is mean cell growth for 0.5mg; μ1 is mean cell growth for 1mg}
+
+The difference in mean growth rates,`r doseTest[[1,1]]`, was within The 95% confidence interval, [`r round(doseTest[[1,2]],2)`,`r round(doseTest[[1,3]],2)`].  Since the confidence interval doesn't contain zero and the p.value, `r doseTest[[1,4]] `, is substantially below α = 0.5, the null hypothesis is rejected.  As such, 1mg dose produced statistically greater cell growth than the 0.5mg dose. 
+
+**2mg versus 1mg Dose**        
+H0: μ2 =  μ1 | Ha: μ2 <> μ1 {where μ1 is mean cell growth for 1mg and μ2 is mean cell growth for 2mg}
+
+Similarly, the difference in mean cell growth between the 1mg and 2mg doses, `r  doseTest[[2,1]]`, was well within the 95% confidence interval, [`r round(doseTest[[2,2]],2)`,`r round(doseTest[[2,3]],2)`].  The p.value, `r doseTest[[2,4]]`, is substantially below  α = 0.5 and the 95% confidence interval does not contain zero.  Therefore, the null hypothesis is rejected. As such, 2mg dose produced statistically greater cell growth than the 1mg dose. 
+
+##Impact of Vitamin C Delivery Method on Odontoblast Cell Growth
+To obtain the statistical difference in mean cell growth between the two delivery methods, the following hypothesis was tested.
+H0: μ1 =  μ0 | Ha: μ1 <> μ0 {where μ0 is mean cell growth for OJ and μ1 is mean cell growth for VC}
+
+Subjects administered vitamin C with orange juice saw a mean cell growth `r  suppTest[[1,1]]` greater than those administered with the aqueous solution.  The observed difference in mean cell growth was well within the 95% confidence interval, [`r round(suppTest[[1,2]],2)`,`r round(suppTest[[1,3]],2)`], which *did not include zero difference*. Given the low p.value, `r suppTest[[1,4]] `, and the confidence interval, the null hypothesis is rejected.  Therefore, greater cell growth is associated with vitamin C administered with orange juice across all doses.
+
+##Impact of Treatment (Dose/Delivery) on Odontoblast Cell Growth
+The following treatments were tested.
+
+* Treatment 1: 0.5mg dose of Vitamin C with orange juice, where μ1 = mean cell length
+* Treatment 2: 0.5mg dose of Vitamin C with aqueous solution, where μ2 = mean cell length 
+* Treatment 3: 1mg dose of Vitamin C with orange juice, where μ3 = mean cell length
+* Treatment 4: 1mg dose of Vitamin C with aqueous solution, where μ4 = mean cell length
+* Treatment 5: 2mg dose of Vitamin C with orange juice, where μ5 = mean cell length
+* Treatment 6: 2mg dose of Vitamin C with aqueous solution, where μ6 = mean cell length
+
+###Treatment 1 versus Treatment 2
+The following hypotheses were tested.
+H0: μ1 =  μ2 | Ha: μ1 <> μ2    where μ1 is mean cell growth for Treatment 1
+  Ha: μ1 <> μ2         μ2 is mean cell growth for Treatment 2  
+
+The difference in means, `r treatmentTest[[1,1]]`, was within the 95% confidence interval, [`r round(treatmentTest[[1,2]],2)`,`r round(treatmentTest[[1,3]],2)`], which included zero difference between the means. Further, the p.value, `r treatmentTest[[1,4]] `, was in excess of α = 0.05,  Therefore, the null hypothesis was not rejected.  Ergo, there is no statistically significant difference between these two treatments.
+
+###Treatment 2 versus Treatment 3
+The following hypotheses were tested.
+  H0: μ2 =  μ3   where μ2 is mean cell growth for Treatment 2
+  Ha: μ2 <> μ3         μ3 is mean cell growth for Treatment 3 
+
+The difference in means, `r treatmentTest[[2,1]]`, is within the 95% confidence interval, [`r round(treatmentTest[[2,2]],2)`,`r round(treatmentTest[[2,3]],2)`], which includes zero difference between the means. Further, the p.value, `r treatmentTest[[2,4]] `,  exceeds α = 0.05. Therefore, the null hypothesis was not rejected.  As such, there is no significant difference in cell growth between these treatments.
+
+###Treatment 1 versus Treatment 3
+The following hypotheses were tested.
+  H0: μ1 =  μ3   where μ1 is mean cell growth for Treatment 1
+  Ha: μ1 <> μ3         μ3 is mean cell growth for Treatment 3  
+
+The difference in means, `r treatmentTest[[3,1]]`,  was within the 95% confidence interval, [`r round(treatmentTest[[3,2]],2)`,`r round(treatmentTest[[3,3]],2)`], which did not include zero. Further, the p.value, `r treatmentTest[[3,4]]`, was *slightly* less than α = 0.05.  Therefore, the null hypothesis was rejected. As such, the analysis shows that there is a statistically significant difference in growth rates between these two treatments.
+
+#Conclusions
+The analysis shows statistically different mean odontoblast cell growth at each **dose** level.  Higher doses directly correlate with greater cell growth, regardless of delivery method.
+
+The impact of **delivery method** on odontoblast cell growth depends upon the dose. At the aggregate level, vitamin C administered with orange juice produces the greatest cell growth. The analysis shows that this is also true for the 0.5mg and 1mg dosing regimes.  On the other hand, there is no statistically significant difference in cell growth between the delivery methods at the higher (2.0mg) dose.  
+
+#References
+1. Crampton, E. W. (1947). The growth of the odontoblast of the incisor teeth as a criterion of vitamin C intake of the guinea pig. The Journal of Nutrition, 33(5): 491–504.
+2. Maechler, M. (n.d.). R Manual. Retrieved from R Manual: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html
+3. Kuns, E. (2015, April 17). Bug 15953 - ToothGrowth {datasets} description improvement. Retrieved from Bugzilla: https://bugs.r-project.org/bugzilla3/show_bug.cgi?id=15953
+4. Winter, J. d. (2013). Using the Student’s t-test with extremely small sample sizes. Practical Assessment, Research & Evaluation.
+
+
+#Appendix
+
+##Figures
+```{r boxPlots, echo = FALSE, fig.height = 4, fig.width = 10, anchor = "Figure", message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<boxPlots>>
+```
+
+`r figr("boxPlots", TRUE, type="Figure")`: Odontoblast Cell Growth by Dose, Delivery & Treatment
+
+
+```{r distributions, echo = FALSE, fig.height = 8, fig.width = 10, anchor = "Figure", message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<distributions>>
+```
+
+`r figr("distributions", TRUE, type="Figure")`: Distributions of Odontoblasts Cell Growth
+
+```{r powerCurve, echo = FALSE, fig.height = 4, fig.width = 10, anchor = "Figure", message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<plotPowerCurve>>
+```
+
+`r figr("powerCurve", TRUE, type="Figure")`: Power Curve
+
+
+##Tables
+
+`r figr("tgStats", TRUE, type="Table")`: Descriptive Statistics of Tooth Growth Data Set
+```{r tgStats, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE), anchor = "Table"}
+tgStats
+```
+
+`r figr("doseStats", TRUE, type="Table")`: Descriptive Statistics of Tooth Growth Data Set by Dose
+```{r doseStats, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE), anchor = "Table"}
+doseStats
+```
+
+`r figr("suppStats", TRUE, type="Table")`: Descriptive Statistics of Tooth Growth Data Set by Delivery Method
+```{r suppStats, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE), anchor = "Table"}
+suppStats
+```
+
+`r figr("treatmentStats", TRUE, type="Table")`: Descriptive Statistics of Tooth Growth Data Set by Treatment
+```{r treatmentStats, echo = FALSE, message = F, eval = T, tidy=TRUE, tidy.opts=list(comment=TRUE), anchor = "Table"}
+treatmentStats
+```
+
+##Code
+**Calculate Descriptive Statistics
+```{r echo = TRUE, size = "small", message = F, eval = F, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<descStats>>
+```
+
+**Conduct t-tests***
+```{r echo = TRUE, size = "small", message = F, eval = F, tidy=TRUE, tidy.opts=list(comment=TRUE)}
+<<t.tests>>
+```
+
+```{r index}
+anchors("index")
+```
