@@ -85,40 +85,91 @@ colnames(treatmentStats) <- colNames
 ## ---- t.tests
 ## Difference in mean cell growth between doses
 doseResults <- list()
-doseResults[[1]] <- t.test(tg$len[tg$dose == "1"] - tg$len[tg$dose == "0.5"])
-doseResults[[2]] <- t.test(tg$len[tg$dose == "2"] - tg$len[tg$dose == "1"])  
+doseResults[[1]] <- t.test(tg$len[tg$dose == "1"] - 
+                           tg$len[tg$dose == "0.5"])
+doseResults[[2]] <- t.test(tg$len[tg$dose == "2"] - 
+                           tg$len[tg$dose == "1"])  
 
 ## Difference in mean cell growth between delivery methods
 suppResults <- list()
-suppResults[[1]] <- t.test(tg$len[tg$supp == "OJ"] - tg$len[tg$supp == "VC"])
+suppResults[[1]] <- t.test(tg$len[tg$supp == "OJ"] - 
+                           tg$len[tg$supp == "VC"])
 
 ## Difference in mean cell growth between treatments
 treatmentResults <- list()
-treatmentResults[[1]] <- t.test(tg$len[tg$dose.supp == "2 OJ"] - tg$len[tg$dose.supp == "1 OJ"])
-treatmentResults[[2]] <- t.test(tg$len[tg$dose.supp == "2 VC"] - tg$len[tg$dose.supp == "2 OJ"])
-treatmentResults[[3]] <- t.test(tg$len[tg$dose.supp == "2 VC"] - tg$len[tg$dose.supp == "1 OJ"])
+treatmentResults[[1]] <- t.test(tg$len[tg$dose.supp == "0.5 OJ"] - 
+                                tg$len[tg$dose.supp == "0.5 VC"])
+treatmentResults[[2]] <- t.test(tg$len[tg$dose.supp == "1 OJ"] - 
+                                tg$len[tg$dose.supp == "1 VC"])
+treatmentResults[[3]] <- t.test(tg$len[tg$dose.supp == "2 OJ"] - 
+                                tg$len[tg$dose.supp == "2 VC"])
+## ---- end
 
-## Store Results
-doseTest <- t(sapply(doseResults, function(x) {
-  c(x$estimate,
-    ci  = x$conf.int,
-    pv  = x$p.value)
-}))
-suppTest <- t(sapply(suppResults, function(x) {
-  c(x$estimate,
-    ci  = x$conf.int,
-    pv  = x$p.value)
-}))
+## ---- storeResults
+alpha <- 0.05
+testCols <- c("Test", "H0", "Ha", "Delta", "Lower CI", "Upper CI", "p.Value", "Result")
+rFunc <- function(x,y) {
+  if (x < y) {
+    r <- "Reject"
+  }else{
+    r <- "Fail to Reject"
+  }
+  return(r)
+}
+## Dose Test Results
+doseTest <- NULL
+Test  <- c(1,2)
+H0    <- c("u1 = u2", "u2 = u3")
+Ha    <- c("u1 <> u2", "u2 <> u3")
+Delta <- c(round(doseResults[[1]]$estimate,2),round(doseResults[[2]]$estimate,2))
+CIl   <- c(round(doseResults[[1]]$conf.int[1],2),round(doseResults[[2]]$conf.int[1],2))
+CIu   <- c(round(doseResults[[1]]$conf.int[2],2), round(doseResults[[2]]$conf.int[2],2))
+pv    <- c(doseResults[[1]]$p.value, doseResults[[2]]$p.value)
+Result <- c(rFunc(doseResults[[1]]$p.value, alpha), rFunc(doseResults[[2]]$p.value, alpha))
+doseTest <- data.frame(Test, H0, Ha, Delta, CIl, CIu, pv, Result, row.names = NULL)
+colnames(doseTest) <- testCols
 
-treatmentTest <- t(sapply(treatmentResults, function(x) {
-  c(x$estimate,
-    ci  = x$conf.int,
-    pv  = x$p.value)}))
+## Delivery Method Test Results
+suppTest <- NULL
+rownames(suppTest) <- NULL
+Test  <- 1
+H0    <- c("u1 = u2")
+Ha    <- c("u1 <> u2")
+Delta <- round(suppResults[[1]]$estimate,2)
+CIl   <- round(suppResults[[1]]$conf.int[1],2)
+CIu   <- round(suppResults[[1]]$conf.int[2],2)
+pv    <- suppResults[[1]]$p.value
+Result <- rFunc(suppResults[[1]]$p.value, alpha)
+suppTest <- data.frame(Test, H0, Ha, Delta, CIl, CIu, pv, Result, row.names = NULL)
+colnames(suppTest) <- testCols
 
+## Treatment Test Results
+treatmentTest <- NULL
+rownames(treatmentTest) <- NULL
+Test  <- c(1,2,3)
+H0    <- c("u1 = u2", "u3 = u4", "u5 = u6")
+Ha    <- c("u1 <> u2", "u3 <> u4", "u5 <> u6")
+Delta <- c(round(treatmentResults[[1]]$estimate,2),
+           round(treatmentResults[[2]]$estimate,2),
+           round(treatmentResults[[3]]$estimate,2))
+CIl   <- c(round(treatmentResults[[1]]$conf.int[1],2),
+           round(treatmentResults[[2]]$conf.int[1],2),
+           round(treatmentResults[[3]]$conf.int[1],2))
+CIu   <- c(round(treatmentResults[[1]]$conf.int[2],2), 
+           round(treatmentResults[[2]]$conf.int[2],2),
+           round(treatmentResults[[3]]$conf.int[2],2))
+pv    <- c(treatmentResults[[1]]$p.value, 
+           treatmentResults[[2]]$p.value,
+           treatmentResults[[3]]$p.value)
+Result <- c(rFunc(treatmentResults[[1]]$p.value, alpha), 
+            rFunc(treatmentResults[[2]]$p.value, alpha),
+            rFunc(treatmentResults[[3]]$p.value, alpha))
+treatmentTest <- data.frame(Test, H0, Ha, Delta, CIl, CIu, pv, Result, row.names = NULL)
+colnames(treatmentTest) <- testCols
 ## ---- end
 
 ## ---- power
-alpha   <- 0.5
+alpha   <- .05
 sigma   <- sd(tg$len)
 delta   <- seq(0,10,1)
 pwr     <- NULL
